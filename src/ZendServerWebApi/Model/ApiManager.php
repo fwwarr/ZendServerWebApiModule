@@ -62,13 +62,13 @@ class ApiManager
         Logger $log,
         ApiKey $defaultApiKey,
         ZendServer $targetZendServer,
-        Client $zendserverclient,
+        Client $zendServerClient,
         $config
     ) {
         $this->log = $log;
         $this->defaultApiKey = $defaultApiKey;
         $this->targetZendServer = $targetZendServer;
-        $this->zendServerClient = $zendserverclient;
+        $this->zendServerClient = $zendServerClient;
         $this->config = $config;
     }
 
@@ -221,7 +221,7 @@ class ApiManager
      */
     public function getZendServerClient ()
     {
-        return $this->zendserverclient;
+        return $this->zendServerClient;
     }
 
     /**
