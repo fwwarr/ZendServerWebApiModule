@@ -1,10 +1,11 @@
 <?php
 namespace ZendServerWebApi\Model;
+
+use Zend\Log\Logger;
 use ZendServerWebApi\Model\Response\ApiResponse;
 use ZendServerWebApi\Model\Request;
 use ZendServerWebApi\Model\Exception\ApiException;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use ZendServerWebApi\Model\Http\Client;
 
 /**
  * API Manager
@@ -13,7 +14,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * Request can be send as an internal method of this class :
  * $this->getNotifications() will call "getNotications" API Method
  */
-class ApiManager implements ServiceLocatorAwareInterface
+class ApiManager
 {
     /**
      * Service manager
@@ -28,23 +29,49 @@ class ApiManager implements ServiceLocatorAwareInterface
     protected $outputFormat = "xml";
 
     /**
-     *
-     * @param ServiceLocatorInterface $serviceLocator
+     * 
+     * @var Logger
      */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
-    {
-        $this->serviceManager = $serviceLocator; 
-    }
+    protected $log;
 
     /**
-     * Get Service manager
-     * @return \ZendServerWebApi\Model\ServiceManager
+     * 
+     * @var ApiKey
      */
-    public function getServiceLocator()
-    {
-        return $this->serviceManager;
+    protected $defaultApiKey;
+
+    /**
+     * 
+     * @var ZendServer
+     */
+    protected $targetZendServer;
+
+    /**
+     * 
+     * @var Client
+     */
+    protected $zendServerClient;
+
+    /**
+     * 
+     * @var array
+     */
+    protected $config;
+
+    public function __construct(
+        Logger $log,
+        ApiKey $defaultApiKey,
+        ZendServer $targetZendServer,
+        Client $zendserverclient,
+        $config
+    ) {
+        $this->log = $log;
+        $this->defaultApiKey = $defaultApiKey;
+        $this->targetZendServer = $targetZendServer;
+        $this->zendServerClient = $zendserverclient;
+        $this->config = $config;
     }
-    
+
     /**
      * Returns list of supported API versions
      * @return array 
@@ -144,7 +171,7 @@ class ApiManager implements ServiceLocatorAwareInterface
             $apiRequest->setMethod(Request::METHOD_POST);
         }
         $apiRequest->prepareRequest();
-        $log = $this->getServiceLocator()->get('log');
+        $log = $this->log;
         $log->info($apiRequest->getUriString());
         $httpResponse = $this->getZendServerClient()->send($apiRequest);
         $response = ApiResponse::factory($httpResponse);
@@ -176,7 +203,7 @@ class ApiManager implements ServiceLocatorAwareInterface
      */
     public function getApiKey ()
     {
-        return $this->getServiceLocator()->get('defaultApiKey');
+        return $this->defaultApiKey;
     }
 
     /**
@@ -185,7 +212,7 @@ class ApiManager implements ServiceLocatorAwareInterface
      */
     public function getTargetServer ()
     {
-        return $this->getServiceLocator()->get('targetZendServer');
+        return $this->targetZendServer;
     }
 
     /**
@@ -194,7 +221,7 @@ class ApiManager implements ServiceLocatorAwareInterface
      */
     public function getZendServerClient ()
     {
-        return $this->getServiceLocator()->get('zendserverclient');
+        return $this->zendserverclient;
     }
 
     /**
@@ -203,7 +230,7 @@ class ApiManager implements ServiceLocatorAwareInterface
      */
     public function getApiConfig ()
     {
-        $apiConfig = $this->getServiceLocator()->get('config');
+        $apiConfig = $this->config;
         $apiConfig = $apiConfig['console']['router']['routes'];
         return $apiConfig;
     }
