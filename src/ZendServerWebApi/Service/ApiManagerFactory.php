@@ -10,6 +10,17 @@ use ZendServerWebApi\Model\ApiManager;
 class ApiManagerFactory implements FactoryInterface
 {
 
+    public function __invoke($container, $requestedName)
+    {
+        return new ApiManager(
+            $container->get('log'),
+            $container->get('defaultApiKey'),
+            $container->get('targetZendServer'),
+            $container->get('zendServerClient'),
+            $container->get('config')
+        );
+    }
+
     /**
      * Create APIManager as a service
      *
@@ -18,12 +29,6 @@ class ApiManagerFactory implements FactoryInterface
      */
     public function createService (ServiceLocatorInterface $serviceLocator)
     {
-        return new ApiManager(
-            $serviceLocator->get('log'),
-            $serviceLocator->get('defaultApiKey'),
-            $serviceLocator->get('targetZendServer'),
-            $serviceLocator->get('zendServerClient'),
-            $serviceLocator->get('config')
-        );
+        return $this($serviceLocator);
     }
 }
