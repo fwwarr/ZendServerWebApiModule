@@ -1,5 +1,7 @@
 <?php
 namespace ZendServerWebApi\Service;
+
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZendServerWebApi\Model\ApiManager;
@@ -10,7 +12,7 @@ use ZendServerWebApi\Model\ApiManager;
 class ApiManagerFactory implements FactoryInterface
 {
 
-    public function __invoke($container, $requestedName)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new ApiManager(
             $container->get('log'),
